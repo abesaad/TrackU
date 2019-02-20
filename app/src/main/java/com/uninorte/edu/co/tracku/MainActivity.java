@@ -21,15 +21,19 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.uninorte.edu.co.tracku.com.uninorte.edu.co.tracku.gps.GPSManager;
 import com.uninorte.edu.co.tracku.com.uninorte.edu.co.tracku.gps.GPSManagerInterface;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        GPSManagerInterface {
+        GPSManagerInterface, OnMapReadyCallback {
 
     Activity thisActivity=this;
     GPSManager gpsManager;
+    GoogleMap googleMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +60,9 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         checkPermissions();
+        SupportMapFragment supportMapFragment=(SupportMapFragment)
+                this.getSupportFragmentManager().findFragmentById(R.id.google_maps_control);
+        supportMapFragment.getMapAsync(this);
     }
 
     @Override
@@ -181,5 +188,10 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void GPSManagerException(Exception error) {
 
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        this.googleMap=googleMap;
     }
 }

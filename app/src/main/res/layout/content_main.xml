@@ -58,4 +58,12 @@
 
     </LinearLayout>
 
+    <fragment
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        tools:context=".MainActivity"
+        android:id="@+id/google_maps_control"
+        ></fragment>
+
 </LinearLayout>
