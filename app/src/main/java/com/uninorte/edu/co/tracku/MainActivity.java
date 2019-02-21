@@ -6,7 +6,7 @@ import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
+
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
@@ -21,9 +21,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.github.clans.fab.FloatingActionButton;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.uninorte.edu.co.tracku.com.uninorte.edu.co.tracku.gps.GPSManager;
 import com.uninorte.edu.co.tracku.com.uninorte.edu.co.tracku.gps.GPSManagerInterface;
 
@@ -34,6 +38,8 @@ public class MainActivity extends AppCompatActivity
     Activity thisActivity=this;
     GPSManager gpsManager;
     GoogleMap googleMap;
+    double latitude;
+    double longitude;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,14 +48,7 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -63,6 +62,47 @@ public class MainActivity extends AppCompatActivity
         SupportMapFragment supportMapFragment=(SupportMapFragment)
                 this.getSupportFragmentManager().findFragmentById(R.id.google_maps_control);
         supportMapFragment.getMapAsync(this);
+
+        com.github.clans.fab.FloatingActionButton floatingActionButton1=
+                (com.github.clans.fab.FloatingActionButton)
+                        findViewById(R.id.zoom_in_button);
+        floatingActionButton1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(googleMap!=null){
+                    googleMap.moveCamera(CameraUpdateFactory.zoomIn());
+                }
+            }
+        });
+
+        com.github.clans.fab.FloatingActionButton floatingActionButton2=
+                (com.github.clans.fab.FloatingActionButton)
+                        findViewById(R.id.zoom_out_button);
+        floatingActionButton2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(googleMap!=null){
+                    googleMap.moveCamera(CameraUpdateFactory.zoomOut());
+                }
+            }
+        });
+
+        com.github.clans.fab.FloatingActionButton floatingActionButton3=
+                (com.github.clans.fab.FloatingActionButton)
+                        findViewById(R.id.focus_button);
+
+        floatingActionButton3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(googleMap!=null){
+                    googleMap.moveCamera(
+                            CameraUpdateFactory.newLatLng(
+                                    new LatLng(latitude,longitude)));
+                }
+            }
+        });
+
+
     }
 
     @Override
@@ -180,9 +220,22 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void LocationReceived(double latitude, double longitued) {
+    public void LocationReceived(double latitude, double longitude) {
+        this.latitude=latitude;
+        this.longitude=longitude;
         ((TextView)findViewById(R.id.latitude_value)).setText(latitude+"");
-        ((TextView)findViewById(R.id.longitude_value)).setText(longitued+"");
+        ((TextView)findViewById(R.id.longitude_value)).setText(longitude+"");
+        if(googleMap!=null){
+            googleMap.clear();
+            googleMap.
+                    addMarker(new MarkerOptions().
+                            position(new LatLng(latitude,longitude))
+                            .title("you are here")
+                    );
+            googleMap.moveCamera(
+                    CameraUpdateFactory.newLatLng(
+                            new LatLng(latitude,longitude)));
+        }
     }
 
     @Override
