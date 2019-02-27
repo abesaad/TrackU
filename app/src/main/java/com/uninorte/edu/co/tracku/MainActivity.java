@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 
@@ -33,13 +34,14 @@ import com.uninorte.edu.co.tracku.com.uninorte.edu.co.tracku.gps.GPSManagerInter
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        GPSManagerInterface, OnMapReadyCallback {
+        GPSManagerInterface, OnMapReadyCallback, OmsFragment.OnFragmentInteractionListener {
 
     Activity thisActivity=this;
     GPSManager gpsManager;
     GoogleMap googleMap;
     double latitude;
     double longitude;
+    OmsFragment omsFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,18 +145,14 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
+        if (id == R.id.google_maps_fragment_opt) {
             // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
+        } else if (id == R.id.osm_fragment_opt) {
+            this.omsFragment =  OmsFragment.newInstance("","");
+            android.support.v4.app.FragmentTransaction fragmentTransaction =
+                    getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.google_maps_control, omsFragment);
+            fragmentTransaction.commit();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -168,10 +166,16 @@ public class MainActivity extends AppCompatActivity
                 PackageManager.PERMISSION_GRANTED
                 || ActivityCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED
+                || ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED
+                || ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
             AlertDialog.Builder builder=new AlertDialog.Builder(this);
             builder.setMessage(
-                    "We need the GPS location to track U, please grant all the permissions...");
+                    "We need the GPS location to track U and other permissions, please grant all the permissions...");
             builder.setTitle("Permissions granting");
             builder.setPositiveButton(R.string.accept,
                     new DialogInterface.OnClickListener() {
@@ -179,7 +183,8 @@ public class MainActivity extends AppCompatActivity
                 public void onClick(DialogInterface dialog, int which) {
                     ActivityCompat.requestPermissions(thisActivity,
                             new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
-                                    Manifest.permission.ACCESS_FINE_LOCATION},1227);
+                                    Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.READ_EXTERNAL_STORAGE,
+                                    Manifest.permission.WRITE_EXTERNAL_STORAGE},1227);
                 }
             });
             AlertDialog dialog=builder.create();
@@ -246,5 +251,10 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap=googleMap;
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
     }
 }
