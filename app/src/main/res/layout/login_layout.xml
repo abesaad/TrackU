@@ -37,6 +37,7 @@
         android:gravity="center"
         android:layout_gravity="center"
         android:layout_marginTop="40dp"
+        android:id="@+id/login_username_value"
         />
 
     <EditText
@@ -47,6 +48,7 @@
         android:gravity="center"
         android:layout_gravity="center"
         android:layout_marginTop="20dp"
+        android:id="@+id/login_password_value"
         />
 
     <Button

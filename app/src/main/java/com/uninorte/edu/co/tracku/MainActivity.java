@@ -2,6 +2,8 @@ package com.uninorte.edu.co.tracku;
 
 import android.Manifest;
 import android.app.Activity;
+import android.arch.persistence.room.Room;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -21,6 +23,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionButton;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -31,6 +34,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.uninorte.edu.co.tracku.com.uninorte.edu.co.tracku.gps.GPSManager;
 import com.uninorte.edu.co.tracku.com.uninorte.edu.co.tracku.gps.GPSManagerInterface;
+import com.uninorte.edu.co.tracku.database.core.TrackUDatabaseManager;
+import com.uninorte.edu.co.tracku.database.entities.User;
+
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -43,10 +50,47 @@ public class MainActivity extends AppCompatActivity
     double longitude;
     OmsFragment omsFragment;
 
+    static TrackUDatabaseManager INSTANCE;
+
+    static TrackUDatabaseManager getDatabase(final Context context) {
+        if (INSTANCE == null) {
+            synchronized (TrackUDatabaseManager.class) {
+                if (INSTANCE == null) {
+                    INSTANCE= Room.databaseBuilder(context,
+                            TrackUDatabaseManager.class, "database-tracku").
+                            allowMainThreadQueries().build();
+                }
+            }
+        }
+        return INSTANCE;
+    }
+
+    public boolean userAuth(String userName,String password){
+        try{
+            List<User> usersFound=getDatabase(this).userDao().getUserByEmail(userName);
+            if(usersFound.size()>0){
+                return true;
+            }else{
+                return false;
+            }
+        }catch (Exception error){
+            Toast.makeText(this,error.getMessage(),Toast.LENGTH_LONG).show();
+        }
+        return false;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getDatabase(this);
+        String userName=getIntent().getStringExtra("userName");
+        String password=getIntent().getStringExtra("password");
+
+        if(!userAuth(userName,password)){
+            Toast.makeText(this,"User not found!",Toast.LENGTH_LONG).show();
+            finish();
+        }
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -241,6 +285,8 @@ public class MainActivity extends AppCompatActivity
                     CameraUpdateFactory.newLatLng(
                             new LatLng(latitude,longitude)));
         }
+        if(omsFragment!=null)
+            omsFragment.setCenter(latitude,longitude);
     }
 
     @Override

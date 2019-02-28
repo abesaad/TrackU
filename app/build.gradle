@@ -31,4 +31,22 @@ dependencies {
     implementation 'com.google.android.gms:play-services:9.8.0'
     implementation 'com.github.clans:fab:1.6.2'
     implementation 'org.osmdroid:osmdroid-android:6.0.3'
+
+    def work_version = "1.0.0-rc02"
+    implementation "android.arch.work:work-runtime:$work_version"
+    implementation "android.arch.work:work-rxjava2:$work_version"
+    androidTestImplementation "android.arch.work:work-testing:$work_version"
+    def nav_version = "1.0.0-rc02"
+    implementation "android.arch.navigation:navigation-fragment:$nav_version" // For Kotlin use navigation-fragment-ktx
+    implementation "android.arch.navigation:navigation-ui:$nav_version" // For Kotlin use navigation-ui-ktx
+    def lifecycle_version = "2.0.0"
+    implementation "androidx.lifecycle:lifecycle-viewmodel:$lifecycle_version" // For Kotlin use lifecycle-viewmodel-ktx
+    implementation "androidx.lifecycle:lifecycle-livedata:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-runtime:$lifecycle_version"
+    annotationProcessor "androidx.lifecycle:lifecycle-compiler:$lifecycle_version" // For Kotlin use kapt instead of annotationProcessor
+    implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-reactivestreams:$lifecycle_version" // For Kotlin use lifecycle-reactivestreams-ktx
+    testImplementation "androidx.arch.core:core-testing:$lifecycle_version"
+    annotationProcessor "android.arch.persistence.room:compiler:1.1.1"
+
 }
