@@ -36,12 +36,14 @@ import com.uninorte.edu.co.tracku.com.uninorte.edu.co.tracku.gps.GPSManager;
 import com.uninorte.edu.co.tracku.com.uninorte.edu.co.tracku.gps.GPSManagerInterface;
 import com.uninorte.edu.co.tracku.database.core.TrackUDatabaseManager;
 import com.uninorte.edu.co.tracku.database.entities.User;
+import com.uninorte.edu.co.tracku.networking.WebServiceManager;
+import com.uninorte.edu.co.tracku.networking.WebServiceManagerInterface;
 
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        GPSManagerInterface, OnMapReadyCallback, OmsFragment.OnFragmentInteractionListener {
+        GPSManagerInterface, OnMapReadyCallback, OmsFragment.OnFragmentInteractionListener, WebServiceManagerInterface {
 
     Activity thisActivity=this;
     GPSManager gpsManager;
@@ -177,6 +179,12 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            WebServiceManager.CallWebServiceOperation(this,"http://172.17.5.228:8080/WebServiceREST/webresources",
+                    "maincontroller",
+                    "operation",
+                    "PUT",
+                    "This is a test",
+                    "Settings");
             return true;
         }
 
@@ -302,5 +310,15 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onFragmentInteraction(Uri uri) {
 
+    }
+
+    @Override
+    public void WebServiceMessageReceived(String userState, final String message) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getApplication(),message,Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }
