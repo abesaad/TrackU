@@ -14,6 +14,14 @@ public class LoginActivity extends Activity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_layout);
         findViewById(R.id.login_button).setOnClickListener(this);
+        findViewById(R.id.registration_link).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intentForRegistration=new Intent();
+                intentForRegistration.setClass(getApplicationContext(),RegistrationActivity.class);
+                startActivity(intentForRegistration);
+            }
+        });
 
     }
 
@@ -38,6 +46,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
             Intent intentToBeCalled=new Intent();
             String userName=((EditText)findViewById(R.id.login_username_value)).getText()+"";
             String password=((EditText)findViewById(R.id.login_password_value)).getText()+"";
+            intentToBeCalled.putExtra("callType", "userLogin");
             intentToBeCalled.putExtra("userName",userName);
             intentToBeCalled.putExtra("password",password);
             intentToBeCalled.setClass(this,MainActivity.class);

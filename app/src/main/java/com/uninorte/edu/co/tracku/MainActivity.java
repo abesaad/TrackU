@@ -39,6 +39,8 @@ import com.uninorte.edu.co.tracku.database.entities.User;
 import com.uninorte.edu.co.tracku.networking.WebServiceManager;
 import com.uninorte.edu.co.tracku.networking.WebServiceManagerInterface;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
@@ -71,7 +73,9 @@ public class MainActivity extends AppCompatActivity
         try{
             List<User> usersFound=getDatabase(this).userDao().getUserByEmail(userName);
             if(usersFound.size()>0){
-                return true;
+                if(usersFound.get(0).passwordHash.equals(md5(password))){
+                    return true;
+                }
             }else{
                 return false;
             }
@@ -81,16 +85,68 @@ public class MainActivity extends AppCompatActivity
         return false;
     }
 
+    public boolean userRegistration(String userName,String password){
+        try{
+            User newUser=new User();
+            newUser.email=userName;
+            newUser.passwordHash=md5(password);
+            INSTANCE.userDao().insertUser(newUser);
+        }catch (Exception error){
+            Toast.makeText(this,error.getMessage(),Toast.LENGTH_LONG).show();
+            return false;
+        }
+        return true;
+    }
+
+    public String md5(String s) {
+        try {
+            // Create MD5 Hash
+            MessageDigest digest = java.security.MessageDigest.getInstance("MD5");
+            digest.update(s.getBytes());
+            byte messageDigest[] = digest.digest();
+
+            // Create Hex String
+            StringBuffer hexString = new StringBuffer();
+            for (int i=0; i<messageDigest.length; i++)
+                hexString.append(Integer.toHexString(0xFF & messageDigest[i]));
+            return hexString.toString();
+
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        checkPermissions();
         getDatabase(this);
-        String userName=getIntent().getStringExtra("userName");
-        String password=getIntent().getStringExtra("password");
 
-        if(!userAuth(userName,password)){
-            Toast.makeText(this,"User not found!",Toast.LENGTH_LONG).show();
+        String callType=getIntent().getStringExtra("callType");
+        if(callType.equals("userLogin")) {
+            String userName = getIntent().getStringExtra("userName");
+            String password = getIntent().getStringExtra("password");
+
+            if (!userAuth(userName, password)) {
+                Toast.makeText(this, "User not found!", Toast.LENGTH_LONG).show();
+                finish();
+            }
+
+
+        }else if(callType.equals("userRegistration")) {
+            String userName = getIntent().getStringExtra("userName");
+            String password = getIntent().getStringExtra("password");
+
+            if (!userRegistration( userName, password)) {
+                Toast.makeText(this, "Error while registering user!", Toast.LENGTH_LONG).show();
+                finish();
+            }else{
+                Toast.makeText(this, "User registered!", Toast.LENGTH_LONG).show();
+                finish();
+            }
+        }else{
             finish();
         }
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -106,7 +162,7 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        checkPermissions();
+
         SupportMapFragment supportMapFragment=(SupportMapFragment)
                 this.getSupportFragmentManager().findFragmentById(R.id.google_maps_control);
         supportMapFragment.getMapAsync(this);

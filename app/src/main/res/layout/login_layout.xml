@@ -60,6 +60,18 @@
         style="@android:style/Widget.Button"
         android:layout_gravity="center"
         />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="New user registration"
+        android:textSize="18sp"
+        android:layout_marginTop="40dp"
+        android:textAlignment="center"
+        android:linksClickable="true"
+
+        android:autoLink="all"
+        android:id="@+id/registration_link"
+        />
 
 
 </LinearLayout>
